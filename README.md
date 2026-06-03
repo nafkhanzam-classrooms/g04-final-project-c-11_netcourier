@@ -2,10 +2,11 @@
 # Network Programming - Final Project [G04]
 
 ## Anggota Kelompok
-| Nama           | NRP        | Kelas     |
-| ---            | ---        | ----------|
-|                |            |           |
-|                |            |           |
+| Nama                                | NRP        | Kelas |
+| ---                                 | ---        | ----- |
+| Jalu Cahyo Senodiputro              | 5025241155 | C     |
+| Erlangga Rizqi Dwi Raswanto         | 5025241179 | C     |
+| Nabil Irawan                        | 5025241231 | C     |
 
 ## Link Youtube (Unlisted)
 Link ditaruh di bawah ini
