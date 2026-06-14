@@ -68,7 +68,8 @@ NetCourier menyediakan mekanisme pendaftaran akun baru secara langsung dan login
 ### 1.1 Registrasi User Baru
 Ketika pengguna belum memiliki akun, mereka dapat mendaftarkan username dan password. Hashing PBKDF2 akan dilakukan di sisi Gateway sebelum disimpan di database SQLite.
 ![Registrasi User](docs/assets/step1_registration.png)
-
+Registration successful
+![alt text](docs/assets/step1_registration_success.png)
 ### 1.2 Halaman Login
 Setelah terdaftar, pengguna dapat masuk dengan kredensial mereka. Sesi login akan menghasilkan sebuah `session_token` unik yang digunakan untuk mengautentikasi setiap transaksi data selanjutnya.
 ![Halaman Login](docs/assets/test_01_login_page.png)
@@ -112,12 +113,13 @@ Ketika pengguna mulai mengetik, event `ROOM_TYPING_INDICATOR` dikirim ke server 
 
 ### 4.2 Memilih Emoji Reaction
 Pengguna dapat mengklik ikon reaksi pada setiap pesan chat bubble untuk memilih emoji (seperti 🔥, 👍, ❤️, 😂).
-![Memilih Reaksi](docs/assets/test_05_reaction_working.png)
+
+![alt text](<docs/assets/macam ikon reaksi.png>)
 
 ### 4.3 Tampilan Setelah Reaksi Ditambahkan
 Emoji reaksi akan muncul di bawah bubble chat yang bersangkutan dengan jumlah akumulasi klik dan daftar username pemberi reaksi secara dinamis.
-![Reaksi Berhasil](docs/assets/test_04_after_reaction.png)
 
+![Reaksi Berhasil](docs/assets/test_05_reaction_working.png)
 ---
 
 ## 5. Reliable File Transfer (Unggah & Unduh File)
@@ -139,7 +141,6 @@ Mekanisme dynamic chunk size dan thread-safe write locks memungkinkan transfer b
 
 ### 5.4 Unduh Berkas (Streaming Chunked HTTP)
 Pengguna dapat mengunduh berkas langsung dari bubble chat. Web API Server akan meminta data berkas ke Process Server (`DOWNLOAD_REQUEST`) dan melakukan streaming data chunks tersebut kembali ke browser.
-![Download Sukses](docs/assets/step6_download_success.png)
 
 ---
 
