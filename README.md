@@ -9,10 +9,9 @@
 | Nabil Irawan                        | 5025241231 | C     |
 
 ## Link Youtube (Unlisted)
-Link ditaruh di bawah ini
-```
-https://www.youtube.com/watch?v=bgHmax3lRjk
-```
+[Demo Singkat Final Project Pemrograman Jaringan (C) - KEL 11](https://www.youtube.com/watch?v=bgHmax3lRjk)
+
+[![Demo Singkat Final Project Pemrograman Jaringan (C) - KEL 11](https://img.youtube.com/vi/bgHmax3lRjk/0.jpg)](https://www.youtube.com/watch?v=bgHmax3lRjk)
 
 ## Penjelasan Program
 Struktur Komponen & Peran Sistem (Architecture Roles)
