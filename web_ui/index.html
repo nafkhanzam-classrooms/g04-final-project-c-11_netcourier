@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetCourier Web</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#121212',
+                        darker: '#0a0a0a',
+                        primary: '#3b82f6',
+                        secondary: '#1e40af'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #121212; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        
+        /* Explicit Hover for Reactions */
+        .message-bubble-wrapper:hover .reaction-menu {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+    </style>
+</head>
+<body class="bg-darker text-gray-200 font-sans h-screen overflow-hidden flex flex-col">
+    <!-- Navbar -->
+    <header class="bg-dark border-b border-gray-800 p-4 flex justify-between items-center shrink-0">
+        <h1 class="text-xl font-bold tracking-wider text-primary">NetCourier<span class="text-gray-500 font-light text-sm ml-2">Web</span></h1>
+        <div id="nav-user-info" class="hidden flex items-center">
+            <span id="nav-username" class="mr-4 text-sm font-medium"></span>
+            <button id="btn-logout" class="text-sm bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded transition-colors">Logout</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-hidden relative">
+        <!-- View: Auth -->
+        <div id="view-auth" class="absolute inset-0 flex items-center justify-center bg-darker z-50">
+            <div class="bg-dark p-8 rounded-lg shadow-xl w-96 border border-gray-800">
+                <h2 class="text-2xl mb-6 font-semibold text-center" id="auth-title">Login</h2>
+                <form id="auth-form" class="space-y-4">
+                    <input type="text" id="auth-username" placeholder="Username" class="w-full bg-darker border border-gray-700 rounded p-2 focus:outline-none focus:border-primary transition-colors" required>
+                    <input type="password" id="auth-password" placeholder="Password" class="w-full bg-darker border border-gray-700 rounded p-2 focus:outline-none focus:border-primary transition-colors" required>
+                    <div id="auth-display-name-group" class="hidden">
+                        <input type="text" id="auth-display-name" placeholder="Display Name (Optional)" class="w-full bg-darker border border-gray-700 rounded p-2 focus:outline-none focus:border-primary transition-colors">
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-secondary text-white font-medium py-2 rounded transition-colors" id="btn-auth-submit">Login</button>
+                </form>
+                <div class="mt-4 text-center text-sm text-gray-400">
+                    <a href="#" id="link-toggle-auth" class="hover:text-white transition-colors">Need an account? Register</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- View: Dashboard (Waiting Room & Global) -->
+        <div id="view-dashboard" class="hidden absolute inset-0 flex">
+            <!-- Sidebar: Online Users -->
+            <div class="w-64 bg-dark border-r border-gray-800 flex flex-col">
+                <div class="p-4 border-b border-gray-800 flex justify-between items-center shrink-0">
+                    <h3 class="font-semibold text-gray-300">Online Users</h3>
+                    <button id="btn-refresh-users" class="text-gray-500 hover:text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg></button>
+                </div>
+                <div id="list-online-users" class="flex-1 overflow-y-auto p-2 space-y-1">
+                    <!-- User items -->
+                </div>
+            </div>
+
+            <!-- Main Panel: Rooms or PM -->
+            <div class="flex-1 flex flex-col bg-darker relative">
+                <div class="p-4 border-b border-gray-800 flex justify-between items-center shrink-0">
+                    <h3 class="font-semibold text-gray-300 text-lg" id="dashboard-main-title">Rooms Directory</h3>
+                    <button id="btn-create-room" class="bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded text-sm transition-colors">+ New Room</button>
+                </div>
+                <div id="dashboard-main-content" class="flex-1 overflow-y-auto p-6">
+                    <div id="list-rooms" class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                        <!-- Room cards -->
+                    </div>
+                </div>
+                
+                <!-- PM View Overlay -->
+                <div id="pm-view" class="hidden absolute inset-0 bg-darker flex flex-col z-10">
+                    <div class="p-4 border-b border-gray-800 flex items-center shrink-0 bg-dark">
+                        <button id="btn-close-pm" class="mr-3 text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg></button>
+                        <h3 class="font-semibold text-lg" id="pm-title">Private Chat</h3>
+                    </div>
+                    <div id="pm-history" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
+                    <div class="p-4 bg-dark border-t border-gray-800 shrink-0">
+                        <form id="pm-form" class="flex gap-2">
+                            <input type="text" id="pm-input" class="flex-1 bg-darker border border-gray-700 rounded-full px-4 py-2 focus:outline-none focus:border-primary transition-colors" placeholder="Type a message..." autocomplete="off">
+                            <button type="submit" class="bg-primary hover:bg-secondary rounded-full w-10 h-10 flex items-center justify-center transition-colors">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View: Room Chat -->
+        <div id="view-room" class="hidden absolute inset-0 flex bg-darker z-40">
+            <!-- Sidebar: Room Members -->
+            <div class="w-64 bg-dark border-r border-gray-800 flex flex-col hidden lg:flex">
+                <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+                    <h2 class="font-bold text-gray-200">Room Members</h2>
+                    <span id="room-member-count" class="bg-gray-800 text-[10px] px-2 py-0.5 rounded-full text-gray-400">0</span>
+                </div>
+                <div id="room-members-list" class="flex-1 overflow-y-auto p-2 space-y-1">
+                    <!-- Members listed here -->
+                </div>
+
+                <!-- Upload Queue Container -->
+                <div id="upload-queue-container" class="border-t border-gray-800 p-3 hidden max-h-[300px] overflow-y-auto bg-darker/30">
+                    <!-- Queue items will be injected here via JS -->
+                </div>
+            </div>
+
+            <!-- Main Chat -->
+            <div class="flex-1 flex flex-col min-w-0">
+                <div class="p-4 bg-dark border-b border-gray-800 flex justify-between items-center shrink-0">
+                    <div class="flex items-center min-w-0">
+                        <button id="btn-leave-room" class="mr-4 text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        </button>
+                        <h3 class="font-semibold text-lg truncate" id="room-title">Room Name</h3>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="btn-room-files" class="bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded text-sm transition-colors">Files</button>
+                    </div>
+                </div>
+                <div id="room-chat-history" class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <!-- Chat messages -->
+                </div>
+                <div id="typing-indicator" class="px-4 py-1 text-xs text-gray-500 italic h-5"></div>
+                <div class="p-4 bg-dark border-t border-gray-800 shrink-0">
+                    <form id="room-chat-form" class="flex gap-2 items-center">
+                        <button type="button" id="btn-chat-attach" class="text-gray-400 hover:text-white transition-colors" title="Attach file">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                        </button>
+                        <div class="relative">
+                            <button type="button" id="btn-emoji-picker" class="text-gray-400 hover:text-white transition-colors p-1" title="Emojis">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </button>
+                            <div id="emoji-menu" class="hidden absolute bottom-full left-0 mb-2 p-2 bg-gray-900 border border-gray-700 rounded-lg shadow-2xl grid grid-cols-6 gap-1 z-30 min-w-[200px]">
+                                <!-- Emojis injected via JS -->
+                            </div>
+                        </div>
+                        <input type="text" id="room-chat-input" class="flex-1 bg-darker border border-gray-700 rounded-full px-4 py-2 focus:outline-none focus:border-primary transition-colors" placeholder="Type a message..." autocomplete="off">
+                        <button type="submit" class="bg-primary hover:bg-secondary rounded-full w-10 h-10 flex items-center justify-center transition-colors shrink-0">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        </button>
+                    </form>
+                    <!-- Hidden file input for attachment -->
+                    <input type="file" id="chat-file-input" class="hidden" multiple>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toast Notification -->
+        <div id="toast-container" class="absolute bottom-4 right-4 z-50 space-y-2 pointer-events-none"></div>
+        
+        <!-- Modal: Create Room -->
+        <div id="modal-create-room" class="hidden absolute inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div class="bg-dark p-6 rounded-lg shadow-xl w-96 border border-gray-800">
+                <h3 class="text-xl mb-4 font-semibold">Create New Room</h3>
+                <form id="form-create-room" class="space-y-4">
+                    <input type="text" id="new-room-name" placeholder="Room Name" class="w-full bg-darker border border-gray-700 rounded p-2 focus:outline-none focus:border-primary transition-colors" required>
+                    <input type="text" id="new-room-desc" placeholder="Description (Optional)" class="w-full bg-darker border border-gray-700 rounded p-2 focus:outline-none focus:border-primary transition-colors">
+                    <div class="flex justify-end gap-2 mt-4">
+                        <button type="button" id="btn-cancel-create-room" class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+                        <button type="submit" class="px-4 py-2 text-sm bg-primary hover:bg-secondary text-white rounded transition-colors">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal: Room Files -->
+        <div id="modal-room-files" class="hidden absolute inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div class="bg-dark p-6 rounded-lg shadow-xl w-[500px] border border-gray-800 flex flex-col max-h-[80vh]">
+                <div class="flex justify-between items-center mb-4 shrink-0">
+                    <h3 class="text-xl font-semibold">Room Files</h3>
+                    <button id="btn-close-files" class="text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                </div>
+                <div id="list-room-files" class="flex-1 overflow-y-auto space-y-2 mb-4 border border-gray-800 rounded p-2">
+                    <!-- Files go here -->
+                </div>
+                <div class="shrink-0 pt-4 border-t border-gray-800">
+                    <form id="form-upload-file" class="flex gap-2 items-center">
+                        <input type="file" id="file-input" class="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-gray-800 file:text-gray-200 hover:file:bg-gray-700" multiple required>
+                        <button type="submit" class="bg-primary hover:bg-secondary text-sm px-4 py-2 rounded transition-colors whitespace-nowrap">Upload</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="/app.js"></script>
+</body>
+</html>
