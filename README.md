@@ -60,6 +60,33 @@ Aplikasi NetCourier dibagi menjadi beberapa komponen utama yang memiliki peran d
     *   Menyimpan progress upload biner (`self.transfer_progress`) di memori dan menyimpannya secara bertahap ke SQLite DB.
     *   Menyimpan file fisik biner langsung ke folder penyimpanan lokal per-room (`data/` folder).
 
+## Cara Menjalankan Versi Demo Lokal
+Sebelum memulai, pastikan Anda berada di direktori root project `netcourier`. Jalankan perintah-perintah berikut di terminal terpisah.
+
+### Terminal 1: Gateway Server
+```bash
+python -m gateway.main
+```
+
+Gateway akan meluncurkan database SQLite secara otomatis jika file `data/netcourier.db` belum ada.
+
+### Terminal 2: Process Server S1
+```bash
+python -m server.main --server-id S1 --port 9101
+```
+
+### Terminal 3: Process Server S2 (Opsional)
+```bash
+python -m server.main --server-id S2 --port 9102
+```
+
+### Terminal 4: Web Client & API Server
+```bash
+python -m client.main
+```
+
+Akses antarmuka aplikasi melalui peramban di alamat [http://localhost:8080](http://localhost:8080/).
+
 ## Screenshot Hasil
 ## 1. Fitur Autentikasi (Registrasi & Login)
 
@@ -102,6 +129,7 @@ Berikut tampilan room setelah user berhasil masuk. Sistem menampilkan judul room
 Pengguna dapat mengetik pesan dan mengirimkannya. Pesan dikirim menggunakan paket `ROOM_CHAT_SEND` dan disebarkan ke semua anggota room secara real-time via `ROOM_CHAT_BROADCAST`.
 ![Mengirim Pesan](docs/assets/step3_message_sent.png)
 
+![Mengirim Pesan](docs/assets/step3_message_sentd.png)
 ---
 
 ## 4. Emoji Reactions & Typing Indicator
@@ -110,6 +138,8 @@ Untuk meningkatkan interaktivitas room, sistem dilengkapi dengan indikator menge
 
 ### 4.1 Indikator Mengetik (Typing Indicator)
 Ketika pengguna mulai mengetik, event `ROOM_TYPING_INDICATOR` dikirim ke server dan disebarkan ke seluruh anggota room sehingga muncul teks "[Username] is typing..." secara dinamis.
+
+![alt text](<docs/assets/4.1_typing indicator.png>)
 
 ### 4.2 Memilih Emoji Reaction
 Pengguna dapat mengklik ikon reaksi pada setiap pesan chat bubble untuk memilih emoji (seperti 🔥, 👍, ❤️, 😂).
@@ -137,7 +167,6 @@ Setelah semua chunks berhasil diterima oleh Process Server, server memverifikasi
 ### 5.3 Pengujian Berkas Besar (500MB/1GB) & Kecepatan
 Mekanisme dynamic chunk size dan thread-safe write locks memungkinkan transfer berkas besar hingga **1GB** berjalan stabil dengan throughput tinggi (mencapai **113+ MB/s** di browser).
 ![Upload File Besar](docs/assets/upload_progress_2.png)
-![Upload 1GB Selesai](docs/assets/upload_completed.png)
 
 ### 5.4 Unduh Berkas (Streaming Chunked HTTP)
 Pengguna dapat mengunduh berkas langsung dari bubble chat. Web API Server akan meminta data berkas ke Process Server (`DOWNLOAD_REQUEST`) dan melakukan streaming data chunks tersebut kembali ke browser.
@@ -147,8 +176,8 @@ Pengguna dapat mengunduh berkas langsung dari bubble chat. Web API Server akan m
 ## 6. Penghapusan Berkas (File Deletion)
 
 Pengguna dapat menghapus berkas yang telah mereka unggah. Ketika tombol "Delete File" diklik, request `ROOM_DELETE_FILE` dikirim ke server. Server akan menghapus berkas fisik di disk, memperbarui database, dan mengirimkan broadcast `ROOM_DELETE_FILE_BROADCAST` agar kartu file tersebut hilang secara real-time dari layar browser semua anggota room.
-![Kartu File Terhapus](docs/assets/deleted.png)
-![Status File Terhapus](docs/assets/step7_file_deleted.png)
+![menghapus file](<docs/assets/6. hapus file via chat.png>)
+![status file terhapus](<docs/assets/6. status file terhapus.png>)
 
 ---
 
@@ -158,13 +187,17 @@ NetCourier mendukung interaksi banyak pengguna secara simultan di dalam room cha
 
 ### 7.1 Multi-User Chatting
 Interaksi obrolan grup secara real-time antar pengguna yang berbeda di dalam room.
-![Multi-user Chat](docs/assets/test_08_multiuser_chat.png)
+![Multi-user Chat](docs/assets/7.1%20multi%20user%20chat%20realtime.png)
 
 ### 7.2 Kick User (Moderasi)
 Pembuat room (*room owner*) memiliki wewenang untuk mengeluarkan anggota room yang melanggar aturan. Owner dapat mengklik tombol "Kick" di samping nama anggota pada panel daftar member.
-![Melakukan Kick User](docs/assets/test_09_kick_user.png)
+
+![Melakukan Kick User](<docs/assets/7.2 kick user.png>)
 
 ### 7.3 Hasil Setelah User Dikick
 Pengguna yang dikick akan langsung dikeluarkan dari room obrolan secara otomatis dan dipaksa kembali ke dashboard utama dengan notifikasi sistem yang sesuai.
-![User Berhasil Dikick](docs/assets/test_10_user2_kicked.png)
 
+
+![alt text](<docs/assets/7.3 pov ngekick user.png>)
+
+![alt text](<docs/assets/7.3 pov user terkick.png>)
